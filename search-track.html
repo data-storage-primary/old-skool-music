@@ -329,9 +329,7 @@
   <footer>Old Skool DJ &middot; Keep the classics spinning</footer>
 
   <script type="module">
-    import { db, TRACKS_COLLECTION } from "./firebase-config.js";
-    import { collection, getDocs }
-      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { loadTracks, updatedText } from "./tracks-data.js";
 
     const MAX_SHOWN = 100;
 
@@ -444,12 +442,11 @@
     // ---------- Load the library ----------
     async function loadLibrary() {
       try {
-        const snap = await getDocs(collection(db, TRACKS_COLLECTION));
-        tracks = snap.docs
-          .map(d => {
-            const data = d.data();
+        const { tracks: list, updated } = await loadTracks();
+        tracks = list
+          .map((data, i) => {
             return {
-              id: d.id,
+              id: i,
               track: data.track || "",
               artist: data.artist || "",
               year: data.year || "",
@@ -466,12 +463,13 @@
         artistFilter.disabled = false;
         searchText.placeholder = "e.g. blue monday";
         libraryInfo.textContent =
-          `${tracks.length} track${tracks.length === 1 ? "" : "s"} in your library`;
+          `${tracks.length.toLocaleString()} track${tracks.length === 1 ? "" : "s"} in your library` +
+          (updated ? ` · ${updatedText(updated)}` : "");
         searchText.focus();
       } catch (err) {
         console.error(err);
         searchText.placeholder = "Library couldn't load";
-        loadStatus.textContent = `Couldn't load your library: ${err.message}`;
+        loadStatus.textContent = err.message;
         loadStatus.className = "status show error";
       }
     }

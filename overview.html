@@ -334,9 +334,7 @@
   <div class="tip" id="tip" role="tooltip"></div>
 
   <script type="module">
-    import { db, TRACKS_COLLECTION } from "./firebase-config.js";
-    import { collection, getDocs }
-      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { loadTracks, updatedText } from "./tracks-data.js";
 
     const PAGE_SIZE = 25;
     const $ = id => document.getElementById(id);
@@ -416,14 +414,12 @@
     // ---------- Load ----------
     async function load() {
       try {
-        const snap = await getDocs(collection(db, TRACKS_COLLECTION));
+        const { tracks: list, updated } = await loadTracks();
         const decadeCounts = new Map();
         const artistMap = new Map();
         let minYear = Infinity, maxYear = -Infinity;
 
-        snap.docs.forEach(d => {
-          const t = d.data();
-          if (!t.track) return;
+        list.forEach(t => {
           total++;
 
           const year = Number(t.year);
@@ -450,7 +446,8 @@
         $("totalTracks").textContent = fmt(total);
         $("totalArtists").textContent = fmt(artists.length);
         $("totalDecades").textContent = fmt(decadeCounts.size);
-        $("yearSpan").textContent = total ? `Spanning ${minYear} – ${maxYear}` : "No tracks yet";
+        $("yearSpan").textContent = (total ? `Spanning ${minYear} – ${maxYear}` : "No tracks yet") +
+          (updated ? ` · ${updatedText(updated)}` : "");
 
         renderDecades(decadeCounts);
         renderArtists();
@@ -461,7 +458,7 @@
         console.error(err);
         $("loading").classList.add("hidden");
         const e = $("error");
-        e.textContent = `Couldn't load your library: ${err.message}`;
+        e.textContent = err.message;
         e.classList.remove("hidden");
       }
     }
