@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search By Track Name | Old Skool DJ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Monoton&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0a14;
+      --bg-2: #1a1226;
+      --card: #1f1630;
+      --card-hover: #2a1e40;
+      --field: #150f21;
+      --text: #f3eefc;
+      --muted: #a99bc4;
+      --pink: #ff3ea5;
+      --cyan: #2de2e6;
+      --yellow: #ffd23f;
+      --green: #3ddc84;
+      --red: #ff5a5a;
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Rubik', system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(255, 62, 165, 0.16), transparent 45%),
+        radial-gradient(circle at 85% 90%, rgba(45, 226, 230, 0.12), transparent 45%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---------- Header ---------- */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      max-width: 720px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 16px 8px;
+    }
+
+    .logo {
+      font-family: 'Monoton', cursive;
+      font-size: 1.5rem;
+      background: linear-gradient(90deg, var(--pink), var(--yellow), var(--cyan));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+      padding: 8px 12px;
+      border-radius: 10px;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .back-link:hover { color: var(--text); background: var(--card); }
+
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 16px 16px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255, 62, 165, 0.25);
+      border-radius: var(--radius);
+      padding: 26px 24px;
+    }
+
+    h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: 4px; }
+    h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 4px; }
+
+    .subtitle { color: var(--muted); margin-bottom: 22px; }
+
+    .field { margin-bottom: 18px; }
+    .field:last-of-type { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    label .hint { font-weight: 400; color: var(--muted); font-size: 0.85rem; }
+
+    .search-wrap { position: relative; }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--field);
+      color: var(--text);
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 1rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-wrap input { padding-left: 46px; font-size: 1.1rem; }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--pink);
+      box-shadow: 0 0 0 4px rgba(255, 62, 165, 0.15);
+    }
+
+    input:disabled, select:disabled { opacity: 0.6; cursor: wait; }
+
+    select {
+      appearance: none;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a99bc4' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      padding-right: 40px;
+    }
+
+    select option { background: var(--bg-2); }
+
+    .actions { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+
+    button {
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 2px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+
+    .library-info { color: var(--muted); font-size: 0.9rem; align-self: center; }
+
+    /* ---------- Results ---------- */
+    .results-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .results-count { color: var(--muted); font-size: 0.95rem; }
+
+    .results { display: flex; flex-direction: column; gap: 10px; }
+
+    .result {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 16px 18px;
+      background: var(--field);
+      border: 2px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+    }
+
+    .result-main { min-width: 0; }
+
+    .result-track { font-weight: 700; font-size: 1.05rem; overflow-wrap: anywhere; }
+
+    .result-track mark {
+      background: rgba(255, 62, 165, 0.25);
+      color: var(--text);
+      border-radius: 4px;
+      padding: 0 2px;
+    }
+
+    .result-artist { color: var(--muted); font-size: 0.92rem; margin-top: 2px; }
+
+    .result-meta { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+
+    .tag {
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(255, 210, 63, 0.14);
+      color: var(--yellow);
+      white-space: nowrap;
+    }
+
+    .tag.cat   { background: rgba(255, 62, 165, 0.14); color: var(--pink); }
+    .tag.close { background: rgba(45, 226, 230, 0.12); color: var(--cyan); }
+    .tag.exact { background: rgba(61, 220, 132, 0.16); color: var(--green); }
+    .result.is-exact { border-color: rgba(61, 220, 132, 0.45); }
+
+    .empty { text-align: center; color: var(--muted); padding: 24px 8px; }
+
+    .status {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      display: none;
+    }
+
+    .status.show  { display: block; }
+    .status.error { background: rgba(255, 90, 90, 0.12); border: 1px solid var(--red); }
+
+    .hidden { display: none !important; }
+
+    footer {
+      text-align: center;
+      padding: 20px 16px 28px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 460px) {
+      .result { flex-direction: column; align-items: flex-start; }
+      .result-meta { justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="logo">Old Skool DJ</a>
+    <a href="index.html" class="back-link">&larr; Home</a>
+  </header>
+
+  <main>
+
+    <section class="card">
+      <h1>Search By Track Name</h1>
+      <p class="subtitle">Type a track name, or any part of it. Capitals, punctuation and small typos don't matter — "dont stop me now" finds "Don't Stop Me Now".</p>
+
+      <div class="field">
+        <label for="searchText">Track name</label>
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="search" id="searchText" placeholder="Loading your library…" autocomplete="off" disabled>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn-ghost" id="clearBtn">Clear</button>
+        <span class="library-info" id="libraryInfo"></span>
+      </div>
+
+      <div class="status" id="loadStatus" role="status" aria-live="polite"></div>
+    </section>
+
+    <section class="card hidden" id="resultsCard">
+      <div class="results-head">
+        <h2>Results</h2>
+        <span class="results-count" id="resultsCount" aria-live="polite"></span>
+      </div>
+      <div class="results" id="results"></div>
+    </section>
+
+  </main>
+
+  <footer>Old Skool DJ &middot; Keep the classics spinning</footer>
+
+  <script type="module">
+    import { loadTracks, updatedText } from "./tracks-data.js";
+
+    const MAX_SHOWN = 100;
+
+    const $ = id => document.getElementById(id);
+    const searchText   = $("searchText");
+    const clearBtn     = $("clearBtn");
+    const libraryInfo  = $("libraryInfo");
+    const loadStatus   = $("loadStatus");
+    const resultsCard  = $("resultsCard");
+    const resultsCount = $("resultsCount");
+    const resultsList  = $("results");
+
+    let tracks = [];   // every track in the library, loaded once
+
+    // ---------- Text helpers ----------
+
+    // "Don't Stop Me Now!" → "dont stop me now"  (also strips accents, & → and)
+    function normalise(text) {
+      return String(text || "")
+        .toLowerCase()
+        .normalize("NFD").replace(/[̀-ͯ]/g, "")
+        .replace(/['’`]/g, "")
+        .replace(/&/g, " and ")
+        .replace(/[^a-z0-9\s]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    // Number of single-letter changes to turn a into b
+    function editDistance(a, b) {
+      if (a === b) return 0;
+      if (!a.length) return b.length;
+      if (!b.length) return a.length;
+      let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+      for (let i = 1; i <= a.length; i++) {
+        const curr = [i];
+        for (let j = 1; j <= b.length; j++) {
+          curr[j] = Math.min(
+            prev[j] + 1,
+            curr[j - 1] + 1,
+            prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+          );
+        }
+        prev = curr;
+      }
+      return prev[b.length];
+    }
+
+    // How many typos to allow for a word of this length
+    const allowedTypos = len => (len <= 3 ? 0 : len <= 5 ? 1 : 2);
+
+    // Score how well a search matches a track name (0 = no match)
+    function scoreMatch(query, title) {
+      if (!query) return { score: 1, close: false };
+      if (!title) return { score: 0, close: false };
+
+      if (title === query)              return { score: 100, close: false };
+      if (title.startsWith(query))      return { score: 90,  close: false };
+      if (title.includes(query))        return { score: 80,  close: false };
+
+      // "bluemonday" still finds "Blue Monday"
+      const compactQ = query.replace(/ /g, "");
+      const compactT = title.replace(/ /g, "");
+      if (compactQ.length >= 4 && compactT.includes(compactQ)) return { score: 75, close: false };
+
+      // Word by word: every word typed must match a word in the title
+      const qWords = query.split(" ");
+      const tWords = title.split(" ");
+      let total = 0;
+      let usedTypos = false;
+
+      for (const q of qWords) {
+        let best = 0;
+        for (const t of tWords) {
+          let s = 0;
+          if (t === q) s = 1;
+          else if (t.startsWith(q)) s = 0.9;
+          else if (q.length >= 3 && t.includes(q)) s = 0.75;
+          else {
+            const typos = allowedTypos(Math.max(q.length, t.length));
+            if (typos > 0 && Math.abs(q.length - t.length) <= typos) {
+              const d = editDistance(q, t);
+              if (d <= typos) s = 0.6 - d * 0.1;
+            } else if (q.length >= 4 && t.length > q.length) {
+              // typo near the start of a longer word: "monda" vs "monday" handled above, "mondya" here
+              const d = editDistance(q, t.slice(0, q.length));
+              if (d <= allowedTypos(q.length)) s = 0.5;
+            }
+          }
+          if (s > best) best = s;
+        }
+        if (best === 0) { total = 0; break; }
+        if (best < 0.75) usedTypos = true;
+        total += best;
+      }
+
+      if (total > 0) {
+        return { score: 40 + 30 * (total / qWords.length), close: usedTypos };
+      }
+
+      // Last try: whole-name similarity for short titles
+      const longest = Math.max(query.length, title.length);
+      const similarity = 1 - editDistance(query, title) / longest;
+      if (similarity >= 0.7) return { score: 30 * similarity, close: true };
+
+      return { score: 0, close: false };
+    }
+
+    // ---------- Load the library ----------
+    async function loadLibrary() {
+      try {
+        const { tracks: list, updated } = await loadTracks();
+        tracks = list
+          .map((data, i) => {
+            return {
+              id: i,
+              track: data.track || "",
+              artist: data.artist || "",
+              year: data.year || "",
+              category: data.category || "",
+              trackNorm: normalise(data.track)
+            };
+          })
+          .filter(t => t.track);
+
+        searchText.disabled = false;
+        searchText.placeholder = "e.g. blue monday";
+        libraryInfo.textContent =
+          `${tracks.length.toLocaleString()} track${tracks.length === 1 ? "" : "s"} in your library` +
+          (updated ? ` · ${updatedText(updated)}` : "");
+        searchText.focus();
+      } catch (err) {
+        console.error(err);
+        searchText.placeholder = "Library couldn't load";
+        loadStatus.textContent = err.message;
+        loadStatus.className = "status show error";
+      }
+    }
+
+    // ---------- Search ----------
+    function runSearch() {
+      const query = normalise(searchText.value);
+
+      if (!query) {
+        resultsCard.classList.add("hidden");
+        return;
+      }
+
+      // Exact match = the whole track name, ignoring capitals, punctuation and accents.
+      // Everything else that matches (part of the name, or a small typo) is a close match.
+      let matches = tracks
+        .map(t => ({ t, ...scoreMatch(query, t.trackNorm), exact: t.trackNorm === query }))
+        .filter(m => m.score > 0);
+
+      matches.sort((a, b) =>
+        (b.exact ? 1 : 0) - (a.exact ? 1 : 0) || b.score - a.score || a.t.track.localeCompare(b.t.track)
+      );
+
+      renderResults(matches, query);
+    }
+
+    function renderResults(matches, query) {
+      resultsList.innerHTML = "";
+      resultsCard.classList.remove("hidden");
+
+      if (matches.length === 0) {
+        resultsCount.textContent = "";
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "No tracks found. Try fewer words, or just part of the name.";
+        resultsList.appendChild(empty);
+        return;
+      }
+
+      const shown = matches.slice(0, MAX_SHOWN);
+      const exactCount = matches.filter(m => m.exact).length;
+      const closeCount = matches.length - exactCount;
+      const parts = [];
+      if (exactCount) parts.push(`${exactCount.toLocaleString()} exact match${exactCount === 1 ? "" : "es"}`);
+      if (closeCount) parts.push(`${closeCount.toLocaleString()} close match${closeCount === 1 ? "" : "es"}`);
+      resultsCount.textContent = parts.join(" · ") +
+        (matches.length > MAX_SHOWN ? ` — showing the top ${MAX_SHOWN}` : "");
+
+      shown.forEach(({ t, exact }) => {
+        const row = document.createElement("div");
+        row.className = exact ? "result is-exact" : "result";
+
+        const main = document.createElement("div");
+        main.className = "result-main";
+
+        const title = document.createElement("div");
+        title.className = "result-track";
+        appendHighlighted(title, t.track, searchText.value.trim());
+
+        const artistEl = document.createElement("div");
+        artistEl.className = "result-artist";
+        artistEl.textContent = t.artist;
+
+        main.append(title, artistEl);
+
+        const meta = document.createElement("div");
+        meta.className = "result-meta";
+        meta.appendChild(exact ? makeTag("Exact match", "tag exact") : makeTag("Close match", "tag close"));
+        if (t.year) meta.appendChild(makeTag(t.year, "tag"));
+        if (t.category) meta.appendChild(makeTag(t.category, "tag cat"));
+
+        row.append(main, meta);
+        resultsList.appendChild(row);
+      });
+    }
+
+    function makeTag(text, className) {
+      const span = document.createElement("span");
+      span.className = className;
+      span.textContent = text;
+      return span;
+    }
+
+    // Highlight the typed text inside the track name (safely, no HTML injection)
+    function appendHighlighted(el, text, typed) {
+      const idx = typed ? text.toLowerCase().indexOf(typed.toLowerCase()) : -1;
+      if (idx === -1) { el.textContent = text; return; }
+      const mark = document.createElement("mark");
+      mark.textContent = text.slice(idx, idx + typed.length);
+      el.append(text.slice(0, idx), mark, text.slice(idx + typed.length));
+    }
+
+    // Search as you type (short pause so it doesn't run on every key)
+    let timer;
+    searchText.addEventListener("input", () => {
+      clearTimeout(timer);
+      timer = setTimeout(runSearch, 150);
+    });
+
+    clearBtn.addEventListener("click", () => {
+      searchText.value = "";
+      resultsCard.classList.add("hidden");
+      searchText.focus();
+    });
+
+    loadLibrary();
+  </script>
+
+</body>
+</html>
